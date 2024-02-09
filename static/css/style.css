@@ -1,0 +1,80 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+}
+
+html, body{
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+}
+
+
+#box{
+    display: flex;
+    background-color: black;
+    width: 100%;
+    height: 80%;
+}
+
+#box1{
+    width: 50%;
+    height: 100%;
+    background-color:rgb(216, 217, 218);
+    overflow-y: auto;
+    border-color: rgb(5, 5, 5);
+    border-width: 3px;
+}
+
+#box2{
+    width: 50%;
+    height: 100%;
+    background-color:green;
+}
+
+#button{
+    position: relative;
+    width: 100%;
+    height: 10%;
+    background-color: rgb(88, 87, 87);
+    z-index: 10;
+}
+
+#btn1{
+    position: absolute;
+    top: 10px;
+    right: 120px;
+    width:100px;
+}
+#btn2{
+    position: absolute;
+    top: 10px;
+    right: 5px;
+    width: 100px;
+}
+
+#output{
+    position: absolute;
+    display: flex;
+    background-color: rgb(240, 240, 245);
+    width: 100%;
+    height: 10%;
+    bottom: 0px ;
+}
+
+#editor{
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    top: 0px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+#title{
+    background-color: rgb(44, 107, 242);
+    width: 100%;
+    height:10%;
+}
+

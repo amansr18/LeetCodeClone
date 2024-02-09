@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="box">
+        <div id="box1">
+            <h2>Problem Description</h2>
+            <h1>{{ title }}</h1>
+            <pre>{{ description|safe }}</pre>
+        </div>
+        <div id="box2">
+            <textarea id="editor" class="col-5" style="height: 100vh; border: 1px solid black; margin-left: 25px; overflow-y: auto; resize: none;" name="code">{{ exist.code }}{{ starter }}</textarea>
+        </div>
+    </div>
+    <div id="button">
+        <button id="btn1" class="btn btn-primary">Run</button>
+        <button id="btn2" type="button" class="btn btn-primary">Submit</button>
+    </div>
+    <div id="output"><h1>Output:</h1></div>
+</body>
+
+<script>
+    
+    $(document).ready(function() {
+
+        $('editor').keydown(function(e){
+            if(e.keyCode === 9) {
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                var $this = $(this);
+                var value = $this.val();
+                $this.val(value.substring(0, start) + '\t' + value.substring(end));
+                this.selectionStart = this.selectionEnd = start + 1;
+                e.preventDefault();
+            }
+        });
+
+        $("#btn1").click(function(event) {
+            var data = encodeURIComponent(document.getElementById('editor').value);
+            console.log(data)
+            document.getElementById("output").innerHTML = "<h1>Loading...</h1>"
+            $.ajax({
+                url: `/compile/?code=${data}&problem={{ id }}&token={{ token }}`,
+                type: "get",
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    document.getElementById("output").innerHTML = data["stdout"]
+                    document.getElementById("output").innerHTML = "<h1>Output</h1>"
+                    var errors = data["error"]
+                    var input = data["input"]
+                    var output = document.getElementById("output")
+                    for (let key in errors) {
+                        var div = document.createElement("DIV")
+                        if (errors[key] != "passed") {
+                            div.innerHTML = `<br><h4 style="color: red;">Test Case ${key}</h4> - <p style="color: red;">${errors[key]}</p><br>`
+                        } else {
+                            div.innerHTML = `<br><h4 style="color: green;">Test Case ${key}</h4> - <p style="color: green">${errors[key]}</p><br>`
+                        }
+                        output.appendChild(div);
+                    }
+                },
+                error: function(xhr) {
+                    document.getElementById("output").innerHTML += "<br><h1>Oops, there's an error. Please try to refresh to see if it would work, otherwise please report a bug report. Sorry for the inconvenience</h1>"
+                    console.log("error" + xhr.status);
+                }
+            })
+        });
+
+        $("#btn2").click(function(event) {
+            var data = encodeURIComponent(document.getElementById('editor').value);
+            document.getElementById("output").innerHTML = "<h1>Loading...</h1>"
+            $.ajax({
+                url: `/compile/?code=${data}&problem={{ id }}&token={{ token }}`,
+                type: "get",
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    document.getElementById("output").innerHTML = "<h1>Output</h1>"
+                    var errors = data["error"]
+                    var input = data["input"]
+                    var output = document.getElementById("output");
+                    var passed = true
+                    for (let key in errors) {
+                        if (errors[key] != "passed") {
+                            output.innerHTML = "<h1 style='color: red;'>You didn't pass at least 1 test, click run code button to check your output.</h1>"
+                            passed = false
+                        }
+                    }
+                    if (passed === true) {
+                        output.innerHTML = "<h1 style='color: green;'>Congratulation on finishing this problem!</h1>"
+                    }
+                },
+                error: function(xhr) {
+                    document.getElementById("output").innerHTML += "<br><h1>Oops, there's an error. Please try to refresh to see if it would work, otherwise please report a bug report. Sorry for the inconvenience</h1>"
+                    console.log("error" + xhr.status);
+                }
+            })
+        });
+
+        });
+</script>
+</html>
