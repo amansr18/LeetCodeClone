@@ -1,75 +1,192 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <title>CodeEditor</title>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
-<body>
-    <div id="box">
-        <div id="box1">
-            <h2>Problem Description</h2>
-            <h1>{{ title }}</h1>
-            <pre>{{ description|safe }}</pre>
-        </div>
-        <div id="box2">
-            <textarea id="editor" class="col-5" style="height: 100vh; border: 1px solid black; margin-left: 25px; overflow-y: auto; resize: none;" name="code">{{ exist.code }}{{ starter }}</textarea>
-        </div>
-    </div>
-    <div id="button">
-        <button id="btn1" class="btn btn-primary">Run</button>
-        <button id="btn2" type="button" class="btn btn-primary">Submit</button>
-    </div>
-    <div id="output"><h1>Output:</h1></div>
-</body>
 
+<style>
+  *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body{
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+#main{
+    display: flex;
+    width: 100%;
+    height:90%;
+    background-color: black;
+}
+
+#left{
+    padding: 10px;
+    width: 50%;
+    height:100%;
+    background-color: rgb(233, 225, 225);
+    overflow-y: auto;
+}
+
+#right{
+    position: relative;
+    width: 50%;
+    height: 100%;
+    background-color: royalblue;
+}
+
+#out{
+    position: absolute;
+    display: flex;
+    bottom: 0px;
+    width: 100%;
+    height:15%;
+    background-color: turquoise;
+    border: 3px solid black;
+    overflow-y: auto;
+}
+
+#editor{
+    width: 100%;
+    height:80%;
+    background-color: seagreen;
+}
+
+#codeEditor{
+    width: 100%;
+    padding: 20px;
+
+}
+
+
+textarea
+{
+  width: 100%;
+  height: 100px;
+  tab-size: 4;
+}
+
+#raw{
+    width: 100%;
+    height: 15%;
+    padding-top: 5px;
+    border: 2px solid black;
+}
+
+#button{
+    position: absolute;
+    bottom: 15%;
+    right: 10px;
+}
+
+#dropdown{
+    position: absolute;
+}
+</style>
+
+<body>
+  <div id="main">
+    <div id="left">
+      <div class="alert alert-info" role="alert">
+        <h1>Problem Description</h1>
+      </div>
+      <h1>{{ title }}</h1>
+      <pre>{{ description|safe }}</pre>
+    </div>
+    <div id="right">
+      <div id="editor">
+        <!-- Example split danger button -->
+        <div id="dropdown" class="btn-group">
+          <button type="button" class="btn btn-info" style="margin-left: 5px; height: 4vh; background-color: rgb(6, 69, 129); color: aliceblue;">Python</button>
+          <button type="button" class="btn btn-info dropdown-toggle dropdown-toggle-split" style="height: 4vh; background-color: rgb(6, 69, 129); color: aliceblue;" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu" style="background-color: rgb(5, 42, 75);">
+            <li><a class="dropdown-item" style="color: aliceblue;" href="#">C++</a></li>
+            <li><a class="dropdown-item" style="color: aliceblue;" href="#">JAVA</a></li>
+            <li><a class="dropdown-item" style="color: aliceblue;" href="#">Java Script</a></li>
+          </ul>
+        </div>
+        <textarea id="codeEditor" class="col-5" style="height: 80vh; border: 1px solid black; margin-left: 0px; padding-top: 50px; overflow-y: auto; resize: auto;" name="code">
+          {{ exist.code }}{{ starter }}
+        </textarea>
+      </div>
+      <div id="button">
+        <button id="btn1" type="button" class="btn btn-primary" style="width: 12vb; height: 5vh;">Run</button>
+        <button id="btn2" type="button" class="btn btn-primary" style="width: 12vb; height: 5vh;">Submit</button>
+      </div>
+      <div id="out">Outpput:</div>
+    </div>
+  </div>
+  <div id="raw"><h1>Raw:</h1></div>
+  
+  
+</body>
 <script>
     
+
     $(document).ready(function() {
+      // Tab key functionality
+      document.getElementById('codeEditor').addEventListener('keydown', function(e) {
+        if (e.key == 'Tab') {
+          e.preventDefault();
+          var start = this.selectionStart;
+          var end = this.selectionEnd;
 
-        $('editor').keydown(function(e){
-            if(e.keyCode === 9) {
-                var start = this.selectionStart;
-                var end = this.selectionEnd;
-                var $this = $(this);
-                var value = $this.val();
-                $this.val(value.substring(0, start) + '\t' + value.substring(end));
-                this.selectionStart = this.selectionEnd = start + 1;
-                e.preventDefault();
-            }
-        });
+          // set textarea value to: text before caret + tab + text after caret
+          this.value = this.value.substring(0, start) +
+            "\t" + this.value.substring(end);
 
-        $("#btn1").click(function(event) {
-            var data = encodeURIComponent(document.getElementById('editor').value);
+          // put caret at right position again
+          this.selectionStart =
+            this.selectionEnd = start + 1;
+        }
+      });
+
+
+
+      $("#btn1").click(function(event) {
+            var data = encodeURIComponent(document.getElementById('codeEditor').value);
             console.log(data)
-            document.getElementById("output").innerHTML = "<h1>Loading...</h1>"
+            document.getElementById("out").innerHTML = "<h1>Loading...</h1>"
             $.ajax({
                 url: `/compile/?code=${data}&problem={{ id }}&token={{ token }}`,
                 type: "get",
                 processData: false,
                 contentType: false,
                 success: function(data) {
-                    document.getElementById("output").innerHTML = data["stdout"]
-                    document.getElementById("output").innerHTML = "<h1>Output</h1>"
+                    
+                    document.getElementById("out").innerHTML = "<h4>Output</h4>"
                     var errors = data["error"]
-                    var input = data["input"]
-                    var output = document.getElementById("output")
+                    var stdout = data["stdout"]
+                    //updated Raw uotput
+                    var output1 = document.getElementById("raw")
+                    output1.appendChild(document.createTextNode(stdout["global"]))
+                    
+                    var output = document.getElementById("out")
                     for (let key in errors) {
                         var div = document.createElement("DIV")
                         if (errors[key] != "passed") {
                             div.innerHTML = `<br><h4 style="color: red;">Test Case ${key}</h4> - <p style="color: red;">${errors[key]}</p><br>`
                         } else {
-                            div.innerHTML = `<br><h4 style="color: green;">Test Case ${key}</h4> - <p style="color: green">${errors[key]}</p><br>`
+                            div.innerHTML = `<p style="color: green;">Test Case ${key}</p> - <p style="color: green">${errors[key]}</p>`
                         }
                         output.appendChild(div);
                     }
                 },
                 error: function(xhr) {
-                    document.getElementById("output").innerHTML += "<br><h1>Oops, there's an error. Please try to refresh to see if it would work, otherwise please report a bug report. Sorry for the inconvenience</h1>"
+                    document.getElementById("out").innerHTML += "<br><h1>Oops, there's an error. Please try to refresh to see if it would work, otherwise please report a bug report. Sorry for the inconvenience</h1>"
                     console.log("error" + xhr.status);
                 }
             })
@@ -104,8 +221,9 @@
                     console.log("error" + xhr.status);
                 }
             })
-        });
+      });
 
-        });
+      });
+
 </script>
 </html>
