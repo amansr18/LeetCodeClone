@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 import random
 import string
+import re
 
 
 tokens = []
@@ -71,6 +72,7 @@ def runCode(request):
     test_output = out.stdout.strip()
     test_errors = out.stderr.strip()
 
+
     # Constructing response
     response = {
         "stdout": {"global": test_errors},
@@ -81,16 +83,22 @@ def runCode(request):
         for line in test_errors.split("\n"):
             if "OK" in line:
                 response['error'] = { 1: "passed", 2: 'passed', 3: "passed", 4: "passed", 5: "passed", 6: "passed", 7: "passed"}
+
+            elif "FAIL" in line:
+                failures_match = re.search(r'failures=(\d+)', test_errors)
+                if failures_match:
+                    failures = int(failures_match.group(1))
+                    response["error"]["global"] = "Number of failed TestCases: " + str(failures)
+
+
+            
             else:
-                response["error"]["global"] = test_errors
+                response["error"]["global"] = "Compilation Error: " + line
                 
-    else:
-        for line in test_output.split("\n"):
-            if "FAIL" in line:
-                parts = line.split("::")
-                testcase = parts[1].strip()
-                error_message = parts[2].strip()
-                response["error"][testcase] = error_message
+                
+                
+                
+    
 
     response_json = json.dumps(response, indent=4)
     print("Response:", response_json)

@@ -52,7 +52,7 @@ html, body{
     bottom: 0px;
     width: 100%;
     height:15%;
-    background-color: turquoise;
+    background-color: rgb(233, 236, 239);
     border: 3px solid black;
     overflow-y: auto;
 }
@@ -78,10 +78,13 @@ textarea
 }
 
 #raw{
+  display: flex;
+    color: rgb(10, 10, 10);
     width: 100%;
-    height: 15%;
+    height: 50%;
     padding-top: 5px;
     border: 2px solid black;
+    size-adjust: auto;
 }
 
 #button{
@@ -113,6 +116,7 @@ textarea
             <span class="visually-hidden">Toggle Dropdown</span>
           </button>
           <ul class="dropdown-menu" style="background-color: rgb(5, 42, 75);">
+            <li><a class="dropdown-item" style="color: aliceblue;" href="#">Python</a></li>
             <li><a class="dropdown-item" style="color: aliceblue;" href="#">C++</a></li>
             <li><a class="dropdown-item" style="color: aliceblue;" href="#">JAVA</a></li>
             <li><a class="dropdown-item" style="color: aliceblue;" href="#">Java Script</a></li>
@@ -129,7 +133,7 @@ textarea
       <div id="out">Outpput:</div>
     </div>
   </div>
-  <div id="raw"><h1>Raw:</h1></div>
+  <div id="raw"><b>Raw:</b></div>
   
   
 </body>
@@ -178,7 +182,7 @@ textarea
                     for (let key in errors) {
                         var div = document.createElement("DIV")
                         if (errors[key] != "passed") {
-                            div.innerHTML = `<br><h4 style="color: red;">Test Case ${key}</h4> - <p style="color: red;">${errors[key]}</p><br>`
+                            div.innerHTML = `<br><p style="color: red;">${errors[key]}</p><br>`
                         } else {
                             div.innerHTML = `<p style="color: green;">Test Case ${key}</p> - <p style="color: green">${errors[key]}</p>`
                         }
@@ -193,31 +197,31 @@ textarea
         });
 
         $("#btn2").click(function(event) {
-            var data = encodeURIComponent(document.getElementById('editor').value);
-            document.getElementById("output").innerHTML = "<h1>Loading...</h1>"
+            var data = encodeURIComponent(document.getElementById('codeEditor').value);
+            document.getElementById("out").innerHTML = "<h1>Loading...</h1>"
             $.ajax({
                 url: `/compile/?code=${data}&problem={{ id }}&token={{ token }}`,
                 type: "get",
                 processData: false,
                 contentType: false,
                 success: function(data) {
-                    document.getElementById("output").innerHTML = "<h1>Output</h1>"
+                    document.getElementById("out").innerHTML = "<h1>Output</h1>"
                     var errors = data["error"]
                     var input = data["input"]
-                    var output = document.getElementById("output");
+                    var output = document.getElementById("out");
                     var passed = true
                     for (let key in errors) {
                         if (errors[key] != "passed") {
-                            output.innerHTML = "<h1 style='color: red;'>You didn't pass at least 1 test, click run code button to check your output.</h1>"
+                            output.innerHTML = "<p style='color: red;'>You didn't pass at least 1 test, click run code button to check your output.</p>"
                             passed = false
                         }
                     }
                     if (passed === true) {
-                        output.innerHTML = "<h1 style='color: green;'>Congratulation on finishing this problem!</h1>"
+                        output.innerHTML = "<p style='color: green;'>Congratulation on finishing this problem!</p>"
                     }
                 },
                 error: function(xhr) {
-                    document.getElementById("output").innerHTML += "<br><h1>Oops, there's an error. Please try to refresh to see if it would work, otherwise please report a bug report. Sorry for the inconvenience</h1>"
+                    document.getElementById("out").innerHTML += "<br><h1>Oops, there's an error. Please try to refresh to see if it would work, otherwise please report a bug report. Sorry for the inconvenience</h1>"
                     console.log("error" + xhr.status);
                 }
             })

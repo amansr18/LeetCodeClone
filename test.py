@@ -69,5 +69,17 @@ class PalindromeChecker(unittest.TestCase):
         """Test for palindrome when input is 'My age is 0, 0 si ega ym.'"""
         self.assertTrue(palindrome("My age is 0, 0 si ega ym."))
 
+class CountingTestResult(unittest.TestResult):
+    def __init__(self):
+        super().__init__()
+        self.failures_count = 0
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.failures_count += 1
+
+
 if __name__ == "__main__":
     unittest.main()
+    
+    
